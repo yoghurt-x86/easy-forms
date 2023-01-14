@@ -2,6 +2,7 @@ module Form exposing (..)
 
 
 import Html exposing (Html)
+import Form.Valid exposing (Validation)
 
 
 type Form value valid validated context =
@@ -43,7 +44,14 @@ append field (Form form) =
                 Err f -> Err (append field f)
         , view = \ ctx val ->
               let fieldView = 
-                    field.view (field.getContext ctx) field.state field.error field.label field.description
+                    field.view 
+                        (field.getContext ctx) 
+                        { state = field.state 
+                        , error = field.error 
+                        , label = field.label 
+                        , description = field.description
+                        , placeholder = field.placeholder
+                        }
                         |> Html.map 
                             (\ f -> 
                                 case f of 
@@ -68,7 +76,8 @@ append field (Form form) =
         }
 
 
-appendValid : (valid -> Result error b) 
+
+appendValid : Validation valid b error 
     -> Field a state msg error context localCtx
     -> Form (a -> value) valid (b -> validated) context
     -> Form value valid validated context
@@ -80,12 +89,19 @@ appendValid validate field (Form form) =
             in
             case (this, form.validated val) of
                 (Ok ok, Ok f ) -> Ok (f ok)
-                (Err e, Ok _ ) -> Err (appendValid validate { field | error = Just e } (Form form) )
-                (Ok _, Err f ) -> Err (appendValid validate { field | error = Nothing } f)
-                (Err e, Err f ) -> Err (appendValid validate { field | error = Just e } f)
+                (Err (e, es), Ok _ ) -> Err (appendValid validate { field | error = e :: es } (Form form) )
+                (Ok _, Err f ) -> Err (appendValid validate { field | error = [] } f)
+                (Err (e, es), Err f ) -> Err (appendValid validate { field | error = e :: es } f)
         , view = \ ctx val ->
               let fieldView = 
-                    field.view (field.getContext ctx) field.state field.error field.label field.description
+                    field.view 
+                        (field.getContext ctx)
+                        { state = field.state 
+                        , error = field.error 
+                        , label = field.label 
+                        , description = field.description
+                        , placeholder = field.placeholder
+                        }
                         |> Html.map 
                             (\ f -> 
                                 case f of 
@@ -96,8 +112,8 @@ appendValid validate field (Form form) =
 
                                     Blur ->
                                         case validate val of 
-                                            Ok _ -> appendValid validate { field | error = Nothing } (Form form)
-                                            Err e -> appendValid validate { field | error = Just e } (Form form)
+                                            Ok _ -> appendValid validate { field | error = [] } (Form form)
+                                            Err (e, es) -> appendValid validate { field | error = e :: es } (Form form)
                             )
               in
               fieldView :: 
@@ -125,12 +141,22 @@ view context (Form form) =
         |> List.reverse
 
 
+type alias ViewConfig value state error = 
+    { state : Value value state
+    , error : List error
+    , label : Maybe String
+    , placeholder : Maybe String
+    , description : Maybe String
+    }
+
+
 type alias Field value state msg error ctx fieldCtx =
-    { view : fieldCtx -> Value value state -> Maybe error -> Maybe String -> Maybe String -> (Html (FieldMsg msg))
+    { view : fieldCtx -> ViewConfig value state error -> (Html (FieldMsg msg))
     , state : Value value state
     , update : fieldCtx -> msg -> Value value state -> Value value state 
-    , error : Maybe error
+    , error : List error
     , label : Maybe String
+    , placeholder : Maybe String
     , description : Maybe String
     , getContext : ctx -> fieldCtx
     }
@@ -141,6 +167,12 @@ withLabel : String
     -> Field value state msg error ctx fieldCtx
 withLabel label field = 
     { field | label = Just label }
+
+withPlaceholder : String 
+    -> Field value state msg error ctx fieldCtx
+    -> Field value state msg error ctx fieldCtx
+withPlaceholder placeholder field = 
+    { field | placeholder = Just placeholder }
 
 
 withDescription : String 

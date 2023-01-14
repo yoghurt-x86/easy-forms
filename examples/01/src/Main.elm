@@ -2,9 +2,11 @@ module Main exposing (..)
 
 import Form exposing (Form)
 import Form.SimpleFields
+import Form.Valid
 import Browser
 import Html exposing (..)
 import Html.Events exposing (..)
+
 
 main =
   Browser.element
@@ -15,75 +17,83 @@ main =
     }
 
 
-type alias Fruits =
-    { fruits : List String }
-
 type alias Model = 
-    { form : Form.Form Input Input ValidInput Fruits
-    , fruits : Fruits
+    { form : Form.Form Input Input ValidInput ()
     }
-
 
 
 type alias Input = 
     { email : String
     , password : String
-    , fruit : String
+    , repeatPassword : String
     }
 
 
 type alias ValidInput = 
     { email : String
     , password : String
-    , fruit : String
+    , repeatPassword : String
     }
 
 
 type Msg 
-    = FormMsg (Form Input Input ValidInput Fruits)
+    = FormMsg (Form Input Input ValidInput ())
     | Submit 
 
 
-form : Form Input Input ValidInput Fruits
+form : Form Input Input ValidInput ()
 form = 
-    let notEmpty str = 
-            if String.isEmpty str then 
-                Err "Field is empty"
+    let match p1 p2 =
+            if p1 == p2 then
+                Ok p2
+
             else 
-                Ok str
+                Err ("Password has to match", [])
 
         email = 
-            Form.SimpleFields.textField ""
-                |> Form.withLabel "something"
-                |> Form.withDescription "something more"
+            Form.SimpleFields.textField 
+                { textType = Form.SimpleFields.Email }
+                ""
+                |> Form.withLabel "Email"
+                |> Form.withPlaceholder "email@mail.com"
 
         password = 
-            Form.SimpleFields.textField ""
-                |> Form.withLabel "something"
-                |> Form.withDescription "something more"
+            Form.SimpleFields.textField 
+                { textType = Form.SimpleFields.Password }
+                ""
+                |> Form.withLabel "Password"
+                |> Form.withPlaceholder "Password"
 
-        fruits = 
-            Form.SimpleFields.selectField 
-                .fruits
-                { display = identity
-                , key = identity 
-                }
-                "Banana"
-                |> Form.withLabel "fruits"
-                |> Form.withDescription "something more"
+        repeatPassword = 
+            Form.SimpleFields.textField 
+                { textType = Form.SimpleFields.Password }
+                ""
+                |> Form.withLabel "Repeat password"
 
     in
     Form.succeed Input ValidInput
         |> Form.appendValid 
-            (.email >> notEmpty)
+            (Form.Valid.combine 
+                (   Form.Valid.notEmpty "Input an email"
+                , [ Form.Valid.isEmail "Please input email in a correct format"
+                  ]
+                )
+                |> Form.Valid.at .email
+            )
             email 
-        |> Form.append password 
-        |> Form.append fruits 
+        |> Form.appendValid 
+            (.password >> Form.Valid.notEmpty "empty password")
+            password
+        |> Form.appendValid
+            (\ result -> 
+                match result.password result.repeatPassword
+            )
+            repeatPassword 
 
 
 init : () -> (Model, Cmd Msg)
 init _ = 
-    ( { form = form, fruits = { fruits = [ "Banana", "Apple", "Orange"] } }
+    ( { form = form }
     , Cmd.none
     )
 
@@ -112,8 +122,7 @@ view model =
     div []    
         [ Html.map FormMsg <|
             div [] <|
-                Form.view  
-                    model.fruits
+                Form.view ()
                     model.form
         , button 
             [ onClick Submit ] 
