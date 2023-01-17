@@ -6,6 +6,8 @@ import Form.Valid
 import Browser
 import Html exposing (..)
 import Html.Events exposing (..)
+import Html.Attributes exposing (..)
+import Form exposing (withDescription)
 
 
 main =
@@ -18,8 +20,7 @@ main =
 
 
 type alias Model = 
-    { form : Form.Form Input Input ValidInput ()
-    }
+    { form : Form.Form Input Input Input () }
 
 
 type alias Input = 
@@ -28,27 +29,19 @@ type alias Input =
     , repeatPassword : String
     }
 
-
-type alias ValidInput = 
-    { email : String
-    , password : String
-    , repeatPassword : String
-    }
-
-
 type Msg 
-    = FormMsg (Form Input Input ValidInput ())
+    = FormMsg (Form Input Input Input ())
     | Submit 
 
 
-form : Form Input Input ValidInput ()
+form : Form Input Input Input ()
 form = 
     let match p1 p2 =
             if p1 == p2 then
-                Ok p2
+                Ok ()
 
             else 
-                Err ("Password has to match", [])
+                Err "Password has to match"
 
         email = 
             Form.SimpleFields.textField 
@@ -56,6 +49,11 @@ form =
                 ""
                 |> Form.withLabel "Email"
                 |> Form.withPlaceholder "email@mail.com"
+                |> Form.withDescription "We'll never share your email with anyone else."
+                |> Form.withHints 
+                    [ Form.Valid.notEmpty "Input email"
+                    , Form.Valid.isEmail "Input correct email"
+                    ]
 
         password = 
             Form.SimpleFields.textField 
@@ -69,26 +67,17 @@ form =
                 { textType = Form.SimpleFields.Password }
                 ""
                 |> Form.withLabel "Repeat password"
+                |> Form.withPlaceholder "Repeat password"
+                |> Form.withGlobalHints 
+                    [ \ _ val ->
+                        match val.password val.repeatPassword
+                    ]
 
     in
-    Form.succeed Input ValidInput
-        |> Form.appendValid 
-            (Form.Valid.combine 
-                (   Form.Valid.notEmpty "Input an email"
-                , [ Form.Valid.isEmail "Please input email in a correct format"
-                  ]
-                )
-                |> Form.Valid.at .email
-            )
-            email 
-        |> Form.appendValid 
-            (.password >> Form.Valid.notEmpty "empty password")
-            password
-        |> Form.appendValid
-            (\ result -> 
-                match result.password result.repeatPassword
-            )
-            repeatPassword 
+    Form.succeed Input Input
+        |> Form.append email
+        |> Form.append password
+        |> Form.append repeatPassword 
 
 
 init : () -> (Model, Cmd Msg)
@@ -107,7 +96,7 @@ update msg model =
             )
 
         Submit ->  
-            case Form.valid model.form of
+            case Form.isValid () model.form of
                 Ok _ -> 
                     (model, Cmd.none)
 
@@ -119,13 +108,22 @@ update msg model =
 
 view : Model -> Html Msg
 view model = 
-    div []    
-        [ Html.map FormMsg <|
-            div [] <|
-                Form.view ()
-                    model.form
-        , button 
-            [ onClick Submit ] 
-            [ text "submit" ]
-        ]
+    div [ style "display" "flex"
+        , style "justify-content" "center"
+        , style "padding" "4em"
+        ] 
 
+        [ Html.form 
+            [ onSubmit Submit
+            , class "form" 
+            ]    
+            [ div [] 
+                ( Form.view ()
+                    model.form
+                )
+                |> Html.map FormMsg 
+            , button 
+                [ type_ "submit" ] 
+                [ text "Submit" ]
+            ]
+        ]

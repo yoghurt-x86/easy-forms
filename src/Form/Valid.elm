@@ -3,20 +3,22 @@ module Form.Valid exposing (..)
 import Regex exposing (Regex)
 
 
-type alias NonEmptyList a =
-    (a, List a)
-
 type alias Validation a b error =
-    a -> Result (NonEmptyList error) b
+    a -> Result error b
 
+type alias Hint hint a =
+    a -> Result hint ()
 
-notEmpty : error -> Validation String String error
-notEmpty error value =
+type alias GlobalHint ctx hint form =
+    ctx -> form -> Result hint ()
+
+notEmpty : hint -> Hint hint String
+notEmpty hint value =
     if String.trim value |> String.isEmpty then 
-        Err (error, [])
+        Err hint
 
     else
-        Ok value
+        Ok ()
 
 
 validEmail : Regex
@@ -26,38 +28,9 @@ validEmail =
         |> Maybe.withDefault Regex.never
 
 
-isEmail : error -> Validation String String error
-isEmail error value = 
+isEmail : hint -> Hint hint String
+isEmail hint value = 
     if Regex.contains validEmail value then
-        Ok value 
+        Ok () 
     else 
-        Err (error, [])
-
-
-combine : NonEmptyList (a -> Result (NonEmptyList error) b) -> Validation a b error
-combine (x, xs) value = 
-    List.foldl 
-        (\ valid acc ->
-            case (acc, valid value) of 
-                (Ok a, Ok b) -> Ok a 
-                (Err (e1, errors1), Err (e2, errors2)) -> Err (e1, errors1 ++ (e2 ::errors2))
-                (Err e, Ok _ ) -> Err e
-                (Ok _, Err e) -> Err e
-        )
-        (x value)
-        xs
-
-
-at : (a -> b) -> Validation b c error -> Validation a c error 
-at f validation =
-    f >> validation
-
-
-andMap : Validation b c error -> Validation b b error -> Validation b c error
-andMap try validation value = 
-    case (try value, validation value) of 
-        (Ok new, Ok _) -> Ok new
-        (Err (e1, errors1), Err (e2, errors2)) -> Err (e1, errors1 ++ (e2 ::errors2))
-        (Ok _, Err e) -> Err e
-        (Err e, Ok _) -> Err e
-
+        Err hint

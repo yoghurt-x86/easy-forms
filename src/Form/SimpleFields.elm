@@ -19,15 +19,15 @@ type alias TextFieldConfig =
     }
 
 
-type alias TextField ctx = 
-    Form.Field String TextFieldConfig String String ctx ctx
+type alias TextField form ctx = 
+    Form.Field form String TextFieldConfig String String ctx ctx (Html (FieldMsg String))
 
 
 type TextFieldState = 
     Value String TextFieldConfig
         
 
-textField : TextFieldConfig -> String -> TextField ctx 
+textField : TextFieldConfig -> String -> TextField form ctx 
 textField config value =
     { view = textFieldView
     , state =
@@ -35,11 +35,13 @@ textField config value =
         , textType = config.textType
         }
     , update = textFieldUpdate
-    , error = []
+    , hints = []
     , label = Nothing
     , placeholder = Nothing
     , description = Nothing
     , getContext = identity
+    , hinting = []
+    , globalHinting = []
     }
 
 
@@ -74,23 +76,29 @@ textFieldView _ field =
 
     in
     div []
-        [ label []
+        [ label [ class "form-label"]
             [ text (Maybe.withDefault "" field.label)
             , element
                 [ type_ textType
+                , class "form-input"
+                , case field.hints of 
+                    [] -> class ""
+                    _ -> class "form-input-invalid"
                 , value field.state.value
                 , onInput FieldMsg
                 , onBlur Blur
                 , placeholder (Maybe.withDefault "" field.placeholder)
+
                 ]
                 []
+            , span [ class "form-description" ] [ text (Maybe.withDefault "" field.description) ] 
             ]
         , div [] 
             (List.map 
                 (\ e -> 
-                    p [] [ text e ]
+                    div [ class "form-hint"] [ text e ]
                 )
-                field.error 
+                field.hints 
             )
         ]
 
@@ -106,15 +114,15 @@ type alias SelectFieldConfig a =
     }
 
 
-type alias SelectField ctx a =
-    Form.Field a (SelectFieldConfig a) String String ctx (List a)
+type alias SelectField form ctx a =
+    Form.Field form a (SelectFieldConfig a) String String ctx (List a) (Html (FieldMsg String))
 
 
 type alias SelectFieldState a =
     Value a (SelectFieldConfig a)
 
 
-selectField : (ctx -> List a) -> SelectFieldConfig a -> a -> SelectField ctx a
+selectField : (ctx -> List a) -> SelectFieldConfig a -> a -> SelectField form ctx a
 selectField ctx config value =
     { view = selectFieldView
     , state =
@@ -123,16 +131,17 @@ selectField ctx config value =
         , key = config.key
         }
     , update = selectFieldUpdate
-    , error = []
+    , hints = []
     , label = Nothing
     , placeholder = Nothing
     , description = Nothing
     , getContext = ctx
+    , hinting = []
+    , globalHinting = []
     }
 
 
 selectFieldView : List a -> ViewConfig a (SelectFieldConfig a) String -> Html (FieldMsg String)
-
 selectFieldView list field =
     let
         options =
@@ -143,20 +152,22 @@ selectFieldView list field =
                 list
     in
     div []
-        [ label []
+        [ label [ class "form-label" ]
             [ text (Maybe.withDefault "" field.label)
             , select
                 [ onInput FieldMsg
                 , onBlur Blur
+                , class "form-control"
                 ]
                 options
+            , span [] [ text (Maybe.withDefault "" field.description) ] 
             ]
         , div [] 
             (List.map 
                 (\ e -> 
                     p [] [ text e ]
                 )
-                field.error 
+                field.hints 
             )
         ]
 
