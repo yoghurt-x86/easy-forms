@@ -1,6 +1,6 @@
 module Form.SimpleFields exposing (..)
 
-import Form exposing (FieldMsg(..), Value, ViewConfig)
+import Form.Field as Form exposing (Field, FieldMsg(..), Value, ViewConfig)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -20,7 +20,7 @@ type alias TextFieldConfig =
 
 
 type alias TextField form ctx = 
-    Form.Field form String TextFieldConfig String String ctx ctx (Html (FieldMsg String))
+    Field form String TextFieldConfig String String ctx ctx (Html (FieldMsg String))
 
 
 type TextFieldState = 
@@ -43,11 +43,6 @@ textField config value =
     , hinting = []
     , globalHinting = []
     }
-
-
-defaultError : valid -> Result error valid
-defaultError valid =
-    Ok valid
 
 
 textFieldView : ctx -> ViewConfig String TextFieldConfig String -> Html (FieldMsg String)

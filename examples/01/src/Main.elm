@@ -1,15 +1,15 @@
 module Main exposing (..)
 
-import Form exposing (Form)
-import Form.SimpleFields
-import Form.Valid
+import Form.Html as Form exposing (SimpleForm)
+import Form.SimpleFields as Field
+import Form.Field as Field
 import Browser
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
-import Form exposing (withDescription)
 
 
+main : Program () Model Msg
 main =
   Browser.element
     { init = init
@@ -20,7 +20,7 @@ main =
 
 
 type alias Model = 
-    { form : Form.Form Input Input Input () }
+    { form : SimpleForm Input }
 
 
 type alias Input = 
@@ -30,11 +30,11 @@ type alias Input =
     }
 
 type Msg 
-    = FormMsg (Form Input Input Input ())
+    = FormMsg (SimpleForm Input)
     | Submit 
 
 
-form : Form Input Input Input ()
+form : SimpleForm Input
 form = 
     let match p1 p2 =
             if p1 == p2 then
@@ -44,35 +44,34 @@ form =
                 Err "Password has to match"
 
         email = 
-            Form.SimpleFields.textField 
-                { textType = Form.SimpleFields.Email }
+            Field.textField 
+                { textType = Field.Email }
                 ""
-                |> Form.withLabel "Email"
-                |> Form.withPlaceholder "email@mail.com"
-                |> Form.withDescription "We'll never share your email with anyone else."
-                |> Form.withHints 
-                    [ Form.Valid.notEmpty "Input email"
-                    , Form.Valid.isEmail "Input correct email"
+                |> Field.withLabel "Email"
+                |> Field.withPlaceholder "email@mail.com"
+                |> Field.withDescription "We'll never share your email with anyone else."
+                |> Field.withHints 
+                    [ Field.notEmpty "Input email"
+                    , Field.isEmail "Input correct email"
                     ]
 
         password = 
-            Form.SimpleFields.textField 
-                { textType = Form.SimpleFields.Password }
+            Field.textField 
+                { textType = Field.Password }
                 ""
-                |> Form.withLabel "Password"
-                |> Form.withPlaceholder "Password"
+                |> Field.withLabel "Password"
+                |> Field.withPlaceholder "Password"
 
         repeatPassword = 
-            Form.SimpleFields.textField 
-                { textType = Form.SimpleFields.Password }
+            Field.textField 
+                { textType = Field.Password }
                 ""
-                |> Form.withLabel "Repeat password"
-                |> Form.withPlaceholder "Repeat password"
-                |> Form.withGlobalHints 
+                |> Field.withLabel "Repeat password"
+                |> Field.withPlaceholder "Repeat password"
+                |> Field.withGlobalHints 
                     [ \ _ val ->
                         match val.password val.repeatPassword
                     ]
-
     in
     Form.succeed Input Input
         |> Form.append email
