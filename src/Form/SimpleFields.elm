@@ -19,15 +19,15 @@ type alias TextFieldConfig =
     }
 
 
-type alias TextField form ctx = 
+type alias TextField form ctx =
     Field form String TextFieldConfig String String ctx ctx (Html (FieldMsg String))
 
 
-type TextFieldState = 
-    Value String TextFieldConfig
-        
+type TextFieldState
+    = Value String TextFieldConfig
 
-textField : TextFieldConfig -> String -> TextField form ctx 
+
+textField : TextFieldConfig -> String -> TextField form ctx
 textField config value =
     { view = textFieldView
     , state =
@@ -64,36 +64,41 @@ textFieldView _ field =
 
                 Search ->
                     "search"
-        element = 
-            case field.state.textType of 
-                TextArea -> textarea
-                _ -> input
 
+        element =
+            case field.state.textType of
+                TextArea ->
+                    textarea
+
+                _ ->
+                    input
     in
     div []
-        [ label [ class "form-label"]
+        [ label [ class "form-label" ]
             [ text (Maybe.withDefault "" field.label)
             , element
                 [ type_ textType
                 , class "form-input"
-                , case field.hints of 
-                    [] -> class ""
-                    _ -> class "form-input-invalid"
+                , case field.hints of
+                    [] ->
+                        class ""
+
+                    _ ->
+                        class "form-input-invalid"
                 , value field.state.value
                 , onInput FieldMsg
                 , onBlur Blur
                 , placeholder (Maybe.withDefault "" field.placeholder)
-
                 ]
                 []
-            , span [ class "form-description" ] [ text (Maybe.withDefault "" field.description) ] 
+            , span [ class "form-description" ] [ text (Maybe.withDefault "" field.description) ]
             ]
-        , div [] 
-            (List.map 
-                (\ e -> 
-                    div [ class "form-hint"] [ text e ]
+        , div []
+            (List.map
+                (\e ->
+                    div [ class "form-hint" ] [ text e ]
                 )
-                field.hints 
+                field.hints
             )
         ]
 
@@ -155,14 +160,14 @@ selectFieldView list field =
                 , class "form-control"
                 ]
                 options
-            , span [] [ text (Maybe.withDefault "" field.description) ] 
+            , span [] [ text (Maybe.withDefault "" field.description) ]
             ]
-        , div [] 
-            (List.map 
-                (\ e -> 
+        , div []
+            (List.map
+                (\e ->
                     p [] [ text e ]
                 )
-                field.hints 
+                field.hints
             )
         ]
 

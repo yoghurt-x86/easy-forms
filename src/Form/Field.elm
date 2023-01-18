@@ -1,26 +1,27 @@
-module Form.Field exposing 
-    ( Map 
-    , Hint 
-    , GlobalHint 
-    , notEmpty
-    , isEmail
-    , Field 
+module Form.Field exposing
+    ( Field
     , FieldMsg(..)
+    , GlobalHint
+    , Hint
+    , Map
     , Value
     , ViewConfig
-    , withLabel
+    , isEmail
+    , notEmpty
     , withDescription
     , withGlobalHints
     , withHints
+    , withLabel
     , withPlaceholder
     )
 
 import Regex exposing (Regex)
 
+
 type alias Field form value state msg hint ctx fieldCtx view =
     { view : fieldCtx -> ViewConfig value state hint -> view
     , state : Value value state
-    , update : fieldCtx -> msg -> Value value state -> Value value state 
+    , update : fieldCtx -> msg -> Value value state -> Value value state
     , hints : List hint
     , label : Maybe String
     , placeholder : Maybe String
@@ -35,7 +36,7 @@ type alias Value value state =
     { state | value : value }
 
 
-type alias ViewConfig value state hint = 
+type alias ViewConfig value state hint =
     { state : Value value state
     , hints : List hint
     , label : Maybe String
@@ -49,53 +50,66 @@ type FieldMsg msg
     | FieldMsg msg
 
 
-withLabel : String 
-    -> Field form value state msg error ctx fieldCtx view 
-    -> Field form value state msg error ctx fieldCtx view 
-withLabel label field = 
+withLabel :
+    String
+    -> Field form value state msg error ctx fieldCtx view
+    -> Field form value state msg error ctx fieldCtx view
+withLabel label field =
     { field | label = Just label }
 
-withPlaceholder : String 
-    -> Field form value state msg error ctx fieldCtx view 
-    -> Field form value state msg error ctx fieldCtx view 
-withPlaceholder placeholder field = 
+
+withPlaceholder :
+    String
+    -> Field form value state msg error ctx fieldCtx view
+    -> Field form value state msg error ctx fieldCtx view
+withPlaceholder placeholder field =
     { field | placeholder = Just placeholder }
 
-withDescription : String 
-    -> Field form value state msg error ctx fieldCtx view 
-    -> Field form value state msg error ctx fieldCtx view 
-withDescription description field = 
+
+withDescription :
+    String
+    -> Field form value state msg error ctx fieldCtx view
+    -> Field form value state msg error ctx fieldCtx view
+withDescription description field =
     { field | description = Just description }
 
-withHints : List (Hint hint value) 
-    -> Field form value state msg hint ctx fieldCtx view 
+
+withHints :
+    List (Hint hint value)
     -> Field form value state msg hint ctx fieldCtx view
-withHints hints field = 
+    -> Field form value state msg hint ctx fieldCtx view
+withHints hints field =
     { field | hinting = hints }
 
-withGlobalHints : List (GlobalHint ctx hint form) 
-    -> Field form value state msg hint ctx fieldCtx view 
+
+withGlobalHints :
+    List (GlobalHint ctx hint form)
     -> Field form value state msg hint ctx fieldCtx view
-withGlobalHints hints field = 
+    -> Field form value state msg hint ctx fieldCtx view
+withGlobalHints hints field =
     { field | globalHinting = hints }
 
 
 type alias Map a b hint =
     a -> Result hint b
 
+
 type alias Hint hint a =
     a -> Result hint ()
+
 
 type alias GlobalHint ctx hint form =
     ctx -> form -> Result hint ()
 
+
 notEmpty : hint -> Hint hint String
 notEmpty hint value =
-    if String.trim value |> String.isEmpty then 
+    if String.trim value |> String.isEmpty then
         Err hint
 
     else
         Ok ()
+
 
 validEmail : Regex
 validEmail =
@@ -105,8 +119,9 @@ validEmail =
 
 
 isEmail : hint -> Hint hint String
-isEmail hint value = 
+isEmail hint value =
     if Regex.contains validEmail value then
-        Ok () 
-    else 
+        Ok ()
+
+    else
         Err hint
