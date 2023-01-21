@@ -4,12 +4,14 @@ import Form.Field
     exposing
         ( Field
         , FieldMsg(..)
-        , Map
+        , Mapped
         )
 import Form.Internals
     exposing
         ( formView
         , validateField
+        , hardcodedField
+        , hardcodedView
         )
 import Html exposing (Html)
 
@@ -57,26 +59,62 @@ append field (Form form) =
         }
 
 
-appendMap :
-    Map valid b error
+hardcoded :
+    a
+    -> FormT (a -> value) valid (a -> value) context
+    -> FormT value valid value context
+hardcoded value (Form form) =
+    Form
+        { value = form.value value
+        , validated =
+            hardcodedField (Ok value) form Form (hardcoded value)
+        , view =
+            \ctx val ->
+                hardcodedView form Html.map (hardcoded value) ctx val
+        }
+
+
+appendMapped :
+    Mapped valid b error
     -> Field valid a state msg error context localCtx (Html (FieldMsg msg))
     -> FormT (a -> value) valid (b -> validated) context
     -> FormT value valid validated context
-appendMap validate field (Form form) =
+appendMapped validate field (Form form) =
     Form
         { value = form.value field.state.value
         , validated =
             \ctx val ->
-                validateField (validate val) form Form field (appendMap validate) ctx val
+                validateField (validate val) form Form field (appendMapped validate) ctx val
         , view =
             \ctx val ->
-                formView field form Html.map Html.map Form (appendMap validate) ctx val
+                formView field form Html.map Html.map Form (appendMapped validate) ctx val
+        }
+
+
+hardcodedMapped :
+    Mapped valid b error
+    -> a
+    -> FormT (a -> value) valid (b -> validated) context
+    -> FormT value valid validated context
+hardcodedMapped validate value (Form form) =
+    Form
+        { value = form.value value
+        , validated = \ ctx val ->
+            hardcodedField (validate val) form Form (hardcodedMapped validate value) ctx val
+        , view =
+            \ctx val ->
+                hardcodedView form Html.map (hardcodedMapped validate value) ctx val
         }
 
 
 isValid : context -> FormT value value validated context -> Result (FormT value value validated context) validated
 isValid context (Form form) =
     form.validated context form.value
+
+
+get : FormT value value validated context -> value
+get (Form form) =
+    form.value
 
 
 view : context -> FormT value value validated context -> List (Html (FormT value value validated context))

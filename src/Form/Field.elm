@@ -1,12 +1,14 @@
 module Form.Field exposing
     ( Field
     , FieldMsg(..)
+    , isDefined
     , GlobalHint
     , Hint
-    , Map
+    , Mapped
     , Value
     , ViewConfig
     , isEmail
+    , isTrue
     , notEmpty
     , withDescription
     , withGlobalHints
@@ -90,7 +92,7 @@ withGlobalHints hints field =
     { field | globalHinting = hints }
 
 
-type alias Map a b hint =
+type alias Mapped a b hint =
     a -> Result hint b
 
 
@@ -111,6 +113,15 @@ notEmpty hint value =
         Ok ()
 
 
+isTrue : hint -> Hint hint Bool
+isTrue hint value =
+    if value then
+        Err hint
+
+    else
+        Ok ()
+
+
 validEmail : Regex
 validEmail =
     "^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
@@ -125,3 +136,14 @@ isEmail hint value =
 
     else
         Err hint
+
+
+isDefined : hint -> Hint hint (Maybe a)
+isDefined hint value =
+    case value of 
+        Just _ -> 
+            Ok()
+        
+        Nothing -> 
+            Err hint
+

@@ -1,6 +1,6 @@
 module Form.Internals exposing (..)
 
-import Form.Field exposing (Field, FieldMsg(..), Map)
+import Form.Field exposing (Field, FieldMsg(..), Mapped)
 
 
 checkHints : ctx -> form -> Field form value state msg hint ctx fieldCtx view -> List hint
@@ -75,6 +75,47 @@ validateField fieldVal form makeForm field continue ctx val =
 
         ( Err e, Err f ) ->
             Err (continue { field | hints = e } f)
+
+    
+hardcodedField :
+    Result hint fieldval
+    -> { form | validated : ctx -> val -> Result form2 (fieldval -> validated) }
+    -> ({ form | validated : ctx -> val -> Result form2 (fieldval -> validated) } -> form2)
+    -> (form2 -> continue)
+    -> ctx
+    -> val
+    -> Result continue validated
+hardcodedField fieldVal form makeForm continue ctx val =
+    case ( fieldVal, form.validated ctx val ) of
+        ( Ok ok, Ok f ) ->
+            Ok (f ok)
+
+        ( Err _, Ok _ ) ->
+            Err (continue (makeForm form))
+
+        ( Ok _, Err f ) ->
+            Err (continue f)
+
+        ( Err e, Err f ) ->
+            Err (continue f)
+
+
+hardcodedView :
+    { formRecord | view : ctx -> valid -> List html6 }
+    -> ((form -> continue) -> html6 -> html5)
+    -> (form -> continue)
+    -> ctx
+    -> valid
+    -> List html5
+hardcodedView form map continue ctx val =
+    (form.view ctx val
+        |> List.map
+            (map
+                (\forms ->
+                    continue forms
+                )
+            )
+    )
 
 
 formView :
