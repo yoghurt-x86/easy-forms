@@ -6,7 +6,7 @@ example () {
     elm make src/Main.elm --optimize --output="main.js"
     cd ../../
 
-    mkdir -p ./pages/examples/$1
+    mkdir -p ./docs/examples/$1
     mv examples/$1/main.js $_
     cp examples/index.html $_
 }
