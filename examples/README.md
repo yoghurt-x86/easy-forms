@@ -1,4 +1,4 @@
-# Examples of using forms:
+# Examples of using easy-forms:
 
 Check out the examples in this folder to see how the api is used to create forms!
 
