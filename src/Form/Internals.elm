@@ -6,6 +6,11 @@ module Form.Internals exposing
     , validateField
     )
 
+{-| This module is only used internally by this package
+
+It is exposed so form packages for elm-css and elm-ui can be implemented with the same logic
+-}
+
 import Form.Field exposing (Field, FieldMsg(..))
 
 
