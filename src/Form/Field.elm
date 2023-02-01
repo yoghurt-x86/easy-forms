@@ -1,12 +1,12 @@
 module Form.Field exposing
     ( Field
     , FieldMsg(..)
-    , isDefined
     , GlobalHint
     , Hint
-    , Mapped
+    , Parser
     , Value
     , ViewConfig
+    , isDefined
     , isEmail
     , isTrue
     , notEmpty
@@ -92,7 +92,7 @@ withGlobalHints hints field =
     { field | globalHinting = hints }
 
 
-type alias Mapped a b hint =
+type alias Parser a b hint =
     a -> Result hint b
 
 
@@ -140,10 +140,9 @@ isEmail hint value =
 
 isDefined : hint -> Hint hint (Maybe a)
 isDefined hint value =
-    case value of 
-        Just _ -> 
-            Ok()
-        
-        Nothing -> 
-            Err hint
+    case value of
+        Just _ ->
+            Ok ()
 
+        Nothing ->
+            Err hint

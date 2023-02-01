@@ -1,5 +1,3 @@
-mkdir pages
-
 
 example () {
     cd examples/$1/
@@ -11,10 +9,7 @@ example () {
     cp examples/index.html $_
 }
 
-
-# Examples 01
 example 01
 example 02
 example 03
 example 04
-

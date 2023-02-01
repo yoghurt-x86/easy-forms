@@ -1,4 +1,22 @@
-module Form.SimpleFields exposing (..)
+module Form.SimpleFields exposing
+    ( CheckFieldConfig
+    , ColorFieldConfig
+    , DateFieldConfig
+    , FileFieldConfig
+    , RangeFieldConfig
+    , SelectFieldConfig
+    , TextFieldConfig
+    , TextType(..)
+    , checkBox
+    , colorField
+    , dateField
+    , fileField
+    , rangeField
+    , selectContextualField
+    , selectField
+    , selectMaybeField
+    , textField
+    )
 
 import Color exposing (Color)
 import Date exposing (Date)
@@ -132,10 +150,10 @@ selectMaybeField list config value =
     { view = \_ -> selectFieldView (Nothing :: List.map Just list)
     , state =
         { value = value
-        , display = (Maybe.map config.display) >> (Maybe.withDefault "")
-        , key = (Maybe.map config.key) >> (Maybe.withDefault "")
+        , display = Maybe.map config.display >> Maybe.withDefault ""
+        , key = Maybe.map config.key >> Maybe.withDefault ""
         }
-    , update = \ _ -> selectFieldUpdate (Nothing :: List.map Just list)
+    , update = \_ -> selectFieldUpdate (Nothing :: List.map Just list)
     , hints = []
     , label = Nothing
     , placeholder = Nothing
@@ -145,6 +163,7 @@ selectMaybeField list config value =
     , globalHinting = []
     }
 
+
 selectField : List a -> SelectFieldConfig a -> a -> SelectField form ctx ctx a
 selectField list config value =
     { view = \_ -> selectFieldView list
@@ -153,7 +172,7 @@ selectField list config value =
         , display = config.display
         , key = config.key
         }
-    , update = \ _ -> selectFieldUpdate list
+    , update = \_ -> selectFieldUpdate list
     , hints = []
     , label = Nothing
     , placeholder = Nothing
@@ -162,6 +181,7 @@ selectField list config value =
     , hinting = []
     , globalHinting = []
     }
+
 
 selectContextualField : (ctx -> List a) -> SelectFieldConfig a -> a -> SelectField form ctx (List a) a
 selectContextualField ctx config value =
@@ -188,13 +208,14 @@ selectFieldView list field =
         options =
             List.map
                 (\a ->
-                    option 
-                        [ value (field.state.key a) 
-                        , if (field.state.key a) == (field.state.key field.state.value) then 
-                            selected True 
-                          else 
+                    option
+                        [ value (field.state.key a)
+                        , if field.state.key a == field.state.key field.state.value then
+                            selected True
+
+                          else
                             selected False
-                        ] 
+                        ]
                         [ text (field.state.display a) ]
                 )
                 list
@@ -269,7 +290,7 @@ type alias DateFieldState =
     Value (Maybe Date) DateFieldConfig
 
 
-dateField : (Maybe Date) -> DateField form ctx
+dateField : Maybe Date -> DateField form ctx
 dateField value =
     { view = dateFieldView
     , state =
@@ -289,7 +310,7 @@ dateFieldView : ctx -> ViewConfig (Maybe Date) DateFieldConfig String -> Html (F
 dateFieldView _ field =
     let
         datestring date =
-            (Date.year date 
+            (Date.year date
                 |> String.fromInt
                 |> String.padLeft 4 '0'
             )
@@ -317,7 +338,7 @@ dateFieldView _ field =
                     _ ->
                         class "form-input-invalid"
                 , Maybe.map (value << datestring)
-                    field.state.value 
+                    field.state.value
                     |> Maybe.withDefault (class "")
                 , inputDecoder
                     (\str ->
@@ -427,7 +448,9 @@ rangeFieldUpdate _ msg state =
     { state | value = msg }
 
 
-type alias ColorFieldConfig = {}
+type alias ColorFieldConfig =
+    {}
+
 
 type alias ColorField form ctx =
     Field form Color ColorFieldConfig Color String ctx ctx (Html (FieldMsg Color))
@@ -472,7 +495,7 @@ colorFieldView _ field =
                         Color.toRgba field.state.value
 
                     hex val =
-                        String.padLeft 2 '0' <| 
+                        String.padLeft 2 '0' <|
                             Hex.toString (round (val * 255.0))
                   in
                   value <|
@@ -482,11 +505,17 @@ colorFieldView _ field =
                         ++ hex c.blue
                 , inputDecoder
                     (\str ->
-                        let r = String.slice 1 3 str
-                            g = String.slice 3 5 str
-                            b = String.slice 5 7 str
+                        let
+                            r =
+                                String.slice 1 3 str
+
+                            g =
+                                String.slice 3 5 str
+
+                            b =
+                                String.slice 5 7 str
                         in
-                        case 
+                        case
                             Result.map3 Color.rgb255
                                 (Hex.fromString r)
                                 (Hex.fromString g)
@@ -518,7 +547,9 @@ colorFieldUpdate _ msg state =
     { state | value = msg }
 
 
-type alias CheckFieldConfig = {}
+type alias CheckFieldConfig =
+    {}
+
 
 type alias CheckField form ctx =
     Field form Bool CheckFieldConfig Bool String ctx ctx (Html (FieldMsg Bool))
@@ -548,7 +579,7 @@ checkFieldView : ctx -> ViewConfig Bool CheckFieldConfig String -> Html (FieldMs
 checkFieldView _ field =
     div []
         [ label [ class "form-label" ]
-            [input
+            [ input
                 [ type_ "checkbox"
                 , class "form-input"
                 , case field.hints of
@@ -558,7 +589,7 @@ checkFieldView _ field =
                     _ ->
                         class "form-input-invalid"
                 , checked field.state.value
-                , onCheck FieldMsg 
+                , onCheck FieldMsg
                 , onBlur Blur
                 ]
                 []
@@ -580,9 +611,10 @@ checkFieldUpdate _ msg state =
     { state | value = msg }
 
 
-type alias FileFieldConfig = 
+type alias FileFieldConfig =
     { accept : List String
     }
+
 
 type alias FileField form ctx =
     Field form (Maybe File) FileFieldConfig (Maybe File) String ctx ctx (Html (FieldMsg (Maybe File)))
@@ -596,7 +628,7 @@ fileField : FileFieldConfig -> Maybe File -> FileField form ctx
 fileField config value =
     { view = fileFieldView
     , state =
-        { value = value 
+        { value = value
         , accept = config.accept
         }
     , update = fileFieldUpdate
@@ -624,21 +656,24 @@ fileFieldView _ field =
 
                     _ ->
                         class "form-input-invalid"
-                , accept 
-                    ( List.intersperse ", " field.state.accept
+                , accept
+                    (List.intersperse ", " field.state.accept
                         |> List.foldl (++) ""
                     )
                 , stopPropagationOn "change"
                     (Json.map (\x -> ( x, True ))
-                        (Json.at ["target", "files" ]
+                        (Json.at [ "target", "files" ]
                             (Json.list File.decoder)
-                                |> Json.map ( \ l -> 
-                                    case l of 
-                                        [] -> FieldMsg Nothing
-                                        x :: _ -> FieldMsg (Just x)
-                            )
-                        )
+                            |> Json.map
+                                (\l ->
+                                    case l of
+                                        [] ->
+                                            FieldMsg Nothing
 
+                                        x :: _ ->
+                                            FieldMsg (Just x)
+                                )
+                        )
                     )
                 , onBlur Blur
                 ]

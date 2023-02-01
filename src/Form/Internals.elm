@@ -1,6 +1,12 @@
-module Form.Internals exposing (..)
+module Form.Internals exposing
+    ( formView
+    , hardcodedField
+    , hardcodedView
+    , updateField
+    , validateField
+    )
 
-import Form.Field exposing (Field, FieldMsg(..), Mapped)
+import Form.Field exposing (Field, FieldMsg(..))
 
 
 checkHints : ctx -> form -> Field form value state msg hint ctx fieldCtx view -> List hint
@@ -76,7 +82,7 @@ validateField fieldVal form makeForm field continue ctx val =
         ( Err e, Err f ) ->
             Err (continue { field | hints = e } f)
 
-    
+
 hardcodedField :
     Result hint fieldval
     -> { form | validated : ctx -> val -> Result form2 (fieldval -> validated) }
@@ -108,14 +114,13 @@ hardcodedView :
     -> valid
     -> List html5
 hardcodedView form map continue ctx val =
-    (form.view ctx val
+    form.view ctx val
         |> List.map
             (map
                 (\forms ->
                     continue forms
                 )
             )
-    )
 
 
 formView :
