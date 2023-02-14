@@ -9,6 +9,7 @@ module Form.Internals exposing
 {-| This module is only used internally by this package
 
 It is exposed so form packages for elm-css and elm-ui can be implemented with the same logic
+@docs formView, hardcodedField, hardcodedView, updateField, validateField
 -}
 
 import Form.Field exposing (Field, FieldMsg(..))
@@ -46,6 +47,8 @@ checkHints ctx val field =
     local ++ global
 
 
+{-| Validate field 
+-}
 validateField :
     Result hint fieldval
     -> { form | validated : ctx -> val -> Result form2 (fieldval -> validated) }
@@ -88,6 +91,8 @@ validateField fieldVal form makeForm field continue ctx val =
             Err (continue { field | hints = e } f)
 
 
+{-| hardcoded field 
+-}
 hardcodedField :
     Result hint fieldval
     -> { form | validated : ctx -> val -> Result form2 (fieldval -> validated) }
@@ -111,6 +116,8 @@ hardcodedField fieldVal form makeForm continue ctx val =
             Err (continue f)
 
 
+{-| Called every view 
+-}
 hardcodedView :
     { formRecord | view : ctx -> valid -> List html6 }
     -> ((form -> continue) -> html6 -> html5)
@@ -128,6 +135,8 @@ hardcodedView form map continue ctx val =
             )
 
 
+{-| Called every draw
+-}
 formView :
     Field valid a state msg error ctx localCtx html8
     -> { formRecord | view : ctx -> valid -> List html6 }
@@ -164,7 +173,8 @@ formView field form map1 map2 makeForm continue ctx val =
                     )
            )
 
-
+{-| Called every updated
+-}
 updateField :
     ctx
     -> valid

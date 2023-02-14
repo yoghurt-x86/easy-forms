@@ -25,7 +25,7 @@ This particular form package is compatible with [elm/html][]
 @docs viewSimple, view, get, isValid
 
 # Composing forms:
-@docs append, hardcoded, appendParsed, hardcodedParsed
+@docs append, succeed, hardcoded, appendParsed, hardcodedParsed
 -}
 
 import Html exposing (Html)
