@@ -1,4 +1,4 @@
-# Easy forms 
+# Forms package
 
 This package with help you build forms such as this:
 ![Picture of a form](./screenshot.png)
