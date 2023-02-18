@@ -5357,7 +5357,7 @@ var $author$project$Form$Internals$checkHints = F3(
 			$elm$core$List$foldl,
 			F2(
 				function (hint, hints) {
-					var _v1 = hint(field.b$.m);
+					var _v1 = hint(field.b$.k);
 					if (!_v1.$) {
 						return hints;
 					} else {
@@ -5539,12 +5539,12 @@ var $author$project$Form$Html$append = F2(
 		return {
 			X: A5(
 				$author$project$Form$Internals$validateField,
-				$elm$core$Result$Ok(field.b$.m),
+				$elm$core$Result$Ok(field.b$.k),
 				form,
 				$elm$core$Basics$identity,
 				field,
 				$author$project$Form$Html$append),
-			m: form.m(field.b$.m),
+			k: form.k(field.b$.k),
 			eg: F2(
 				function (ctx, val) {
 					return A8($author$project$Form$Internals$formView, field, form, $elm$html$Html$map, $elm$html$Html$map, $elm$core$Basics$identity, $author$project$Form$Html$append, ctx, val);
@@ -5558,13 +5558,13 @@ var $elm$core$Basics$composeR = F3(
 	});
 var $author$project$Main$gifFieldUpdate = F3(
 	function (_v0, msg, state) {
-		var value = state.m;
+		var value = state.k;
 		if (!msg.$) {
 			var search = msg.a;
 			return _Utils_update(
 				state,
 				{
-					m: _Utils_update(
+					k: _Utils_update(
 						value,
 						{V: search})
 				});
@@ -5573,7 +5573,7 @@ var $author$project$Main$gifFieldUpdate = F3(
 			return _Utils_update(
 				state,
 				{
-					m: _Utils_update(
+					k: _Utils_update(
 						value,
 						{
 							ab: $elm$core$Maybe$Just(search)
@@ -5669,7 +5669,7 @@ var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('
 var $author$project$Main$gifFieldView = F2(
 	function (ctx, field) {
 		var selectedGif = function () {
-			var _v1 = field.b$.m.ab;
+			var _v1 = field.b$.k.ab;
 			if (!_v1.$) {
 				var v = _v1.a;
 				return A2(
@@ -5695,7 +5695,7 @@ var $author$project$Main$gifFieldView = F2(
 						$elm$html$Html$Events$onInput($author$project$Main$SearchFor),
 						$elm$html$Html$Attributes$type_('search'),
 						$elm$html$Html$Attributes$placeholder('Search for a gif'),
-						$elm$html$Html$Attributes$value(field.b$.m.V)
+						$elm$html$Html$Attributes$value(field.b$.k.V)
 					]),
 				_List_Nil));
 		var listOfGifs = A2(
@@ -5718,7 +5718,7 @@ var $author$project$Main$gifFieldView = F2(
 								A2($elm$html$Html$Attributes$style, 'width', '8rem'),
 								A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
 								function () {
-								var _v0 = field.b$.m.ab;
+								var _v0 = field.b$.k.ab;
 								if (!_v0.$) {
 									var v = _v0.a;
 									return _Utils_eq(v, gif) ? A2($elm$html$Html$Attributes$style, 'opacity', '0.5') : $elm$html$Html$Attributes$class('');
@@ -5770,7 +5770,7 @@ var $author$project$Main$gifField = function (value) {
 		bq: _List_Nil,
 		aO: $elm$core$Maybe$Nothing,
 		aV: $elm$core$Maybe$Nothing,
-		b$: {m: value},
+		b$: {k: value},
 		ee: $author$project$Main$gifFieldUpdate,
 		eg: $author$project$Main$gifFieldView
 	};
@@ -5790,7 +5790,7 @@ var $author$project$Form$Html$succeed = F2(
 				function (_v0, _v1) {
 					return $elm$core$Result$Ok(validated);
 				}),
-			m: value,
+			k: value,
 			eg: F2(
 				function (_v2, _v3) {
 					return _List_Nil;
@@ -5801,7 +5801,7 @@ var $author$project$Form$SimpleFields$textFieldUpdate = F3(
 	function (_v0, msg, state) {
 		return _Utils_update(
 			state,
-			{m: msg});
+			{k: msg});
 	});
 var $author$project$Form$Field$Blur = {$: 0};
 var $elm$html$Html$label = _VirtualDom_node('label');
@@ -5876,7 +5876,7 @@ var $author$project$Form$SimpleFields$textFieldView = F2(
 										return $elm$html$Html$Attributes$class('form-input-invalid');
 									}
 								}(),
-									$elm$html$Html$Attributes$value(field.b$.m),
+									$elm$html$Html$Attributes$value(field.b$.k),
 									$elm$html$Html$Events$onInput($author$project$Form$Field$FieldMsg),
 									$elm$html$Html$Events$onBlur($author$project$Form$Field$Blur),
 									$elm$html$Html$Attributes$placeholder(
@@ -5925,7 +5925,7 @@ var $author$project$Form$SimpleFields$textField = F2(
 			bq: _List_Nil,
 			aO: $elm$core$Maybe$Nothing,
 			aV: $elm$core$Maybe$Nothing,
-			b$: {an: config.an, m: value},
+			b$: {an: config.an, k: value},
 			ee: $author$project$Form$SimpleFields$textFieldUpdate,
 			eg: $author$project$Form$SimpleFields$textFieldView
 		};
@@ -6834,12 +6834,12 @@ var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Form$Html$get = function (_v0) {
 	var form = _v0;
-	return form.m;
+	return form.k;
 };
 var $author$project$Form$Html$isValid = F2(
 	function (context, _v0) {
 		var form = _v0;
-		return A2(form.X, context, form.m);
+		return A2(form.X, context, form.k);
 	});
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -6914,7 +6914,7 @@ var $author$project$Form$Html$view = F2(
 	function (context, _v0) {
 		var form = _v0;
 		return $elm$core$List$reverse(
-			A2(form.eg, context, form.m));
+			A2(form.eg, context, form.k));
 	});
 var $author$project$Main$view = function (model) {
 	return A2(
