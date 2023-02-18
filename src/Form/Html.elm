@@ -1,34 +1,31 @@
 module Form.Html exposing
-    ( Form
-    , FormT
-    , SimpleForm
-    , append
-    , appendParsed
-    , get
-    , hardcoded
-    , hardcodedParsed
-    , isValid
-    , succeed
-    , view
-    , viewSimple
+    ( SimpleForm, Form, FormT
+    , viewSimple, view, get, isValid
+    , append, succeed, hardcoded, appendParsed, hardcodedParsed
     )
 
 {-| This is where you compose your forms!
-This particular form package is compatible with [elm/html][]
+This particular form package is compatible with [elm/html]
 
-[elm/html] : https://package.elm-lang.org/packages/elm/html/latest/ 
+[elm/html] : <https://package.elm-lang.org/packages/elm/html/latest/>
+
 
 # Definition
+
 @docs SimpleForm, Form, FormT
 
+
 # Using a form:
+
 @docs viewSimple, view, get, isValid
 
+
 # Composing forms:
+
 @docs append, succeed, hardcoded, appendParsed, hardcodedParsed
+
 -}
 
-import Html exposing (Html)
 import Form.Field
     exposing
         ( Field
@@ -42,12 +39,14 @@ import Form.Internals
         , hardcodedView
         , validateField
         )
+import Html exposing (Html)
 
 
 {-| Simplest form shape
 -}
 type alias SimpleForm value =
     FormT value value value ()
+
 
 {-| Expanded form shape
 -}
@@ -86,8 +85,8 @@ get (Form form) =
 
 This returns a list of Html. Each item in the list corresponds to a field in the form.
 
-    div [] 
-        ( view () form )
+    div []
+        (view () form)
 
 -}
 view : context -> Form value validated context -> List (Html (Form value validated context))
@@ -102,8 +101,8 @@ view context (Form form) =
 
 This returns a list of Html. Each item in the list corresponds to a field in the form.
 
-    div [] 
-        ( view form )
+    div []
+        (view form)
 
 -}
 viewSimple : SimpleForm value -> List (Html (SimpleForm value))
@@ -157,9 +156,10 @@ hardcoded value (Form form) =
         }
 
 
-{-| Append another field in your form pipeline. 
+{-| Append another field in your form pipeline.
 
-This time adding a parser step. 
+This time adding a parser step.
+
 -}
 appendParsed :
     Parser valid b error
@@ -180,7 +180,8 @@ appendParsed validate field (Form form) =
 
 {-| Append a hardcoded value in your form pipeline!
 
-This time adding a parser step. 
+This time adding a parser step.
+
 -}
 hardcodedParsed :
     Parser valid b error

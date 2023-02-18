@@ -1,22 +1,23 @@
 module Form.SimpleFields exposing
-    ( CheckFieldConfig
-    , ColorFieldConfig
-    , DateFieldConfig
-    , FileFieldConfig
-    , RangeFieldConfig
-    , SelectFieldConfig
-    , TextFieldConfig
-    , TextType(..)
-    , checkBox
-    , colorField
-    , dateField
-    , fileField
-    , rangeField
-    , selectContextualField
-    , selectField
-    , selectMaybeField
-    , textField
+    ( textField, TextType(..), checkBox, rangeField, dateField, colorField, fileField, selectField, selectMaybeField, selectContextualField
+    , TextFieldConfig, CheckFieldConfig, RangeFieldConfig, DateFieldConfig, ColorFieldConfig, FileFieldConfig, SelectFieldConfig
     )
+
+{-| This modules defines the implementaiton of a number of different fields.
+
+This particular form package is compatible with [elm/html]
+
+
+# Fields:
+
+@docs textField, TextType, checkBox, rangeField, dateField, colorField, fileField, selectField, selectMaybeField, selectContextualField
+
+
+# Input types:
+
+@docs TextFieldConfig, CheckFieldConfig, RangeFieldConfig, DateFieldConfig, ColorFieldConfig, FileFieldConfig, SelectFieldConfig
+
+-}
 
 import Color exposing (Color)
 import Date exposing (Date)
@@ -29,6 +30,8 @@ import Html.Events exposing (..)
 import Json.Decode as Json
 
 
+{-| What type of input for textfields
+-}
 type TextType
     = Text
     | TextArea
@@ -37,6 +40,8 @@ type TextType
     | Search
 
 
+{-| Parameters for textField
+-}
 type alias TextFieldConfig =
     { textType : TextType
     }
@@ -46,10 +51,8 @@ type alias TextField form ctx =
     Field form String TextFieldConfig String String ctx ctx (Html (FieldMsg String))
 
 
-type alias TextFieldState =
-    Value String TextFieldConfig
-
-
+{-| Regular textfield!
+-}
 textField : TextFieldConfig -> String -> TextField form ctx
 textField config value =
     { view = textFieldView
@@ -131,6 +134,8 @@ textFieldUpdate _ msg state =
     { state | value = msg }
 
 
+{-| Parameters for selectFields
+-}
 type alias SelectFieldConfig a =
     { display : a -> String
     , key : a -> String
@@ -141,10 +146,9 @@ type alias SelectField form ctx localCtx a =
     Form.Field form a (SelectFieldConfig a) String String ctx localCtx (Html (FieldMsg String))
 
 
-type alias SelectFieldState a =
-    Value a (SelectFieldConfig a)
-
-
+{-| Dropdown selection field
+This resolves into a maybe type, so it's possible to select "Nothing"
+-}
 selectMaybeField : List a -> SelectFieldConfig a -> Maybe a -> SelectField form ctx ctx (Maybe a)
 selectMaybeField list config value =
     { view = \_ -> selectFieldView (Nothing :: List.map Just list)
@@ -164,6 +168,9 @@ selectMaybeField list config value =
     }
 
 
+{-| Dropdown selection field
+This field will always have a value selected.
+-}
 selectField : List a -> SelectFieldConfig a -> a -> SelectField form ctx ctx a
 selectField list config value =
     { view = \_ -> selectFieldView list
@@ -183,6 +190,9 @@ selectField list config value =
     }
 
 
+{-| Dropdown selection field
+This field uses a context to get a list of possible selection item from outside the form.
+-}
 selectContextualField : (ctx -> List a) -> SelectFieldConfig a -> a -> SelectField form ctx (List a) a
 selectContextualField ctx config value =
     { view = selectFieldView
@@ -278,6 +288,8 @@ inputDecoder decoder =
         )
 
 
+{-| Parameters for datefield
+-}
 type alias DateFieldConfig =
     {}
 
@@ -286,10 +298,8 @@ type alias DateField form ctx =
     Field form (Maybe Date) DateFieldConfig (Maybe Date) String ctx ctx (Html (FieldMsg (Maybe Date)))
 
 
-type alias DateFieldState =
-    Value (Maybe Date) DateFieldConfig
-
-
+{-| Browser Datefield
+-}
 dateField : Maybe Date -> DateField form ctx
 dateField value =
     { view = dateFieldView
@@ -369,6 +379,8 @@ dateFieldUpdate _ msg state =
     { state | value = msg }
 
 
+{-| Parameters for rangefield
+-}
 type alias RangeFieldConfig =
     { min : Float
     , max : Float
@@ -380,10 +392,8 @@ type alias RangeField form ctx =
     Field form Float RangeFieldConfig Float String ctx ctx (Html (FieldMsg Float))
 
 
-type alias RangeFieldState =
-    Value Float RangeFieldConfig
-
-
+{-| Range slider
+-}
 rangeField : RangeFieldConfig -> Float -> RangeField form ctx
 rangeField config value =
     { view = rangeFieldView
@@ -448,6 +458,8 @@ rangeFieldUpdate _ msg state =
     { state | value = msg }
 
 
+{-| Parameters for Colorfield
+-}
 type alias ColorFieldConfig =
     {}
 
@@ -456,10 +468,8 @@ type alias ColorField form ctx =
     Field form Color ColorFieldConfig Color String ctx ctx (Html (FieldMsg Color))
 
 
-type alias ColorFieldState =
-    Value Color ColorFieldConfig
-
-
+{-| Color field
+-}
 colorField : Color -> ColorField form ctx
 colorField value =
     { view = colorFieldView
@@ -547,6 +557,8 @@ colorFieldUpdate _ msg state =
     { state | value = msg }
 
 
+{-| Parameters for checkbox field
+-}
 type alias CheckFieldConfig =
     {}
 
@@ -555,10 +567,9 @@ type alias CheckField form ctx =
     Field form Bool CheckFieldConfig Bool String ctx ctx (Html (FieldMsg Bool))
 
 
-type alias CheckFieldState =
-    Value Bool CheckFieldConfig
-
-
+{-| Checkbox field
+Simple checkbox to get a boolean
+-}
 checkBox : Bool -> CheckField form ctx
 checkBox value =
     { view = checkFieldView
@@ -611,6 +622,8 @@ checkFieldUpdate _ msg state =
     { state | value = msg }
 
 
+{-| Parameters for file field
+-}
 type alias FileFieldConfig =
     { accept : List String
     }
@@ -620,10 +633,8 @@ type alias FileField form ctx =
     Field form (Maybe File) FileFieldConfig (Maybe File) String ctx ctx (Html (FieldMsg (Maybe File)))
 
 
-type alias FileFieldState =
-    Value (Maybe File) FileFieldConfig
-
-
+{-| File field
+-}
 fileField : FileFieldConfig -> Maybe File -> FileField form ctx
 fileField config value =
     { view = fileFieldView

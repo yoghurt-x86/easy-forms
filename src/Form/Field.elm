@@ -1,35 +1,30 @@
 module Form.Field exposing
-    ( Field
-    , FieldMsg(..)
-    , GlobalHint
-    , Hint
-    , Parser
-    , Value
-    , ViewConfig
-    , isDefined
-    , isEmail
-    , isTrue
-    , notEmpty
-    , withDescription
-    , withGlobalHints
-    , withHints
-    , withLabel
-    , withPlaceholder
+    ( withLabel, withPlaceholder, withDescription
+    , Hint, GlobalHint, withHints, withGlobalHints, notEmpty, isTrue, isDefined, isEmail
+    , Field, FieldMsg(..), Parser, Value, ViewConfig
     )
 
 {-| This module defines some of the tools to work with fields
 
+
 ## Label your field:
-@docs withLabel, withPlaceholder, withDescription 
+
+@docs withLabel, withPlaceholder, withDescription
+
 
 ## Validations:
+
 @docs Hint, GlobalHint, withHints, withGlobalHints, notEmpty, isTrue, isDefined, isEmail
 
+
 ## Types:
+
 @docs Field, FieldMsg, Parser, Value, ViewConfig
+
 -}
 
 import Regex exposing (Regex)
+
 
 {-| The internal field type.
 -}
