@@ -5,9 +5,7 @@ module Form.Html exposing
     )
 
 {-| This is where you compose your forms!
-This particular form package is compatible with [elm/html]
-
-[elm/html] : <https://package.elm-lang.org/packages/elm/html/latest/>
+This particular form package is compatible with [elm/html](https://package.elm-lang.org/packages/elm/html/latest/).
 
 
 # Definition
@@ -82,12 +80,6 @@ get (Form form) =
 
 
 {-| Render a form that requires a context
-
-This returns a list of Html. Each item in the list corresponds to a field in the form.
-
-    div []
-        (view () form)
-
 -}
 view : context -> Form value validated context -> List (Html (Form value validated context))
 view context (Form form) =
@@ -101,8 +93,10 @@ view context (Form form) =
 
 This returns a list of Html. Each item in the list corresponds to a field in the form.
 
+You can easily put the list of fields in a `div` or another html elements:
+
     div []
-        (view form)
+        (view () form)
 
 -}
 viewSimple : SimpleForm value -> List (Html (SimpleForm value))
@@ -112,6 +106,20 @@ viewSimple (Form form) =
 
 
 {-| Start of the pipeline
+
+You can compose a new a form in the following fashion:
+
+    Form.succeed Input Input
+        |> Form.append text
+        |> Form.append textArea
+        |> Form.append password
+        |> Form.append select
+        |> Form.append color
+        |> Form.append date
+        |> Form.append number
+        |> Form.append checkBox
+        |> Form.append file
+
 -}
 succeed : value -> validated -> FormT value valid validated context
 succeed value validated =
@@ -140,6 +148,11 @@ append field (Form form) =
 
 
 {-| Append a hardcoded value in your form pipeline!
+
+    Form.succeed Input Input
+        |> Form.append text
+        |> Form.hardcoded "name"
+
 -}
 hardcoded :
     a
