@@ -1,7 +1,9 @@
 module Main exposing (..)
 
-
 import Browser
+import Color exposing (Color)
+import Date exposing (Date)
+import File exposing (File)
 import Form.Field as Field
 import Form.Html as Form exposing (SimpleForm)
 import Form.SimpleFields as Field
@@ -9,9 +11,6 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 
-import Date exposing (Date)
-import Color exposing (Color)
-import File exposing (File)
 
 main : Program () Model Msg
 main =
@@ -63,10 +62,11 @@ form =
                 |> Field.withPlaceholder "Password"
                 |> Field.withHints
                     [ Field.notEmpty "Add a password"
-                    , \ str -> 
-                        if (String.trim >> String.length) str >= 8 then 
+                    , \str ->
+                        if (String.trim >> String.length) str >= 8 then
                             Ok ()
-                        else 
+
+                        else
                             Err "Your password should be at least 8 characters"
                     ]
 
@@ -80,10 +80,11 @@ form =
                     [ Field.notEmpty "Please repeat your password"
                     ]
                 |> Field.withGlobalHints
-                    [ \ _ valid -> 
+                    [ \_ valid ->
                         if valid.password == valid.repeatPassword then
                             Ok ()
-                        else 
+
+                        else
                             Err "Please repeat the same password"
                     ]
 
@@ -92,7 +93,6 @@ form =
                 False
                 |> Field.withLabel "Sign up for our newsletter"
                 |> Field.withDescription "Stay up to date with our latest offers!"
-
     in
     Form.succeed Input Input
         |> Form.append email

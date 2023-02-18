@@ -1,7 +1,9 @@
 module Main exposing (..)
 
-
 import Browser
+import Color exposing (Color)
+import Date exposing (Date)
+import File exposing (File)
 import Form.Field as Field
 import Form.Html as Form exposing (SimpleForm)
 import Form.SimpleFields as Field
@@ -9,9 +11,6 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 
-import Date exposing (Date)
-import Color exposing (Color)
-import File exposing (File)
 
 main : Program () Model Msg
 main =
@@ -62,7 +61,6 @@ form =
                 |> Field.withHints
                     [ Field.notEmpty "Add a password"
                     ]
-
     in
     Form.succeed Input Input
         |> Form.append email
